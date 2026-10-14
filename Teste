@@ -1,0 +1,46 @@
+import streamlit as st
+import pandas as pd
+import psycopg2
+import os
+
+# Configuração da página
+st.set_page_config(page_title="RoundB - Controlo AutoCAD", page_icon="📐", layout="wide")
+
+st.title("📐 RoundB — Gestão de Digitalizações AutoCAD")
+st.subheader("Portal de Atualização para Subempreiteiros & Coordenador")
+
+# Ligação à Base de Dados (Neon / PostgreSQL via Variável de Ambiente)
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+def test_connection():
+    if not DATABASE_URL:
+        st.warning("⚠️ URL da Base de Dados ainda não configurada nas Variáveis do Render.")
+        return False
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        conn.close()
+        return True
+    except Exception as e:
+        st.error(f"Erro na ligação: {e}")
+        return False
+
+# Painel Principal
+if test_connection():
+    st.success("✅ Ligação à Base de Dados estabelecida com sucesso!")
+else:
+    [link suspeito removido]("💡 Quando ligarmos a Base de Dados no Render, este painel ficará ativo.")
+
+st.divider()
+
+# Formulário Exemplo do Subempreiteiro
+st.markdown("### 📝 Atualizar Estado da Especialidade")
+with st.form("form_estado"):
+    subcip = st.text_input("SubCIP / Obra:", placeholder="Ex: SUB.101")
+    especialidade = st.selectbox("Especialidade:", ["Eletricidade", "AVAC", "Águas e Esgotos", "Arquitetura", "Estruturas"])
+    novo_estado = st.selectbox("Novo Estado:", ["Em Curso", "Concluído", "Pendente RB", "Pendente Cliente"])
+    operador = st.text_input("Nome do Operador:", placeholder="O seu nome")
+    observacoes = st.text_area("Observações / Notas:")
+    
+    submetido = st.form_submit_button("Submeter Atualização")
+    if submetido:
+        st.success(f"Registo recebido para {subcip} ({especialidade}) -> {novo_estado}!")
